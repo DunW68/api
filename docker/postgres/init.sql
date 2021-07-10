@@ -1,0 +1,4 @@
+CREATE USER admin WITH  PASSWORD 'devpass';
+
+CREATE  DATABASE post_db;
+GRANT ALL PRIVILEGES ON DATABASE post_db TO admin;

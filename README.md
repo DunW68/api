@@ -1,0 +1,1 @@
+django + postgresql + drf + djoser + docker + celery
