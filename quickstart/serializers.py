@@ -6,7 +6,7 @@ from .models import Items, Cart
 from rest_framework import serializers
 
 
-class UserSerializer(serializers.ModelSerializer):
+class UsersSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
