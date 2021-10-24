@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="WebServers">
+    <option name="servers">
+      <webServer id="0694f240-ea82-494d-9678-7639ec3a3caa" name="https://my-stage.hawk.ru:81/login/" url="https://my-stage.hawk.ru:81/login/">
+        <fileTransfer accessType="SFTP" host="79.143.27.10" port="22021" sshConfigId="b5aea86d-cbcd-43c5-a054-414fec49e2c4" sshConfig="hc-avangard@79.143.27.10:22021 password">
+          <advancedOptions>
+            <advancedOptions dataProtectionLevel="Private" keepAliveTimeout="0" passiveMode="true" shareSSLContext="true" />
+          </advancedOptions>
+        </fileTransfer>
+      </webServer>
+    </option>
+  </component>
+</project>

@@ -57,17 +57,18 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework.authtoken',
     'quickstart.apps.QuickstartConfig',
-    'djoser',
+    #'djoser',
     'psycopg2',
     'django_celery_beat',
     'django_celery_results',
+    'drf_yasg'
 ]
 
 REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'PAGE_SIZE': 10,
     'DEFAULT_AUTHENTICATION_CLASSES': [
-                                        'rest_framework.authentication.TokenAuthentication',
+                                        'rest_framework.authentication.BasicAuthentication',
                                        ],
 
 }
@@ -136,17 +137,22 @@ WSGI_APPLICATION = 'djangoProject.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql_psycopg2',
+#         'NAME': 'post_db',
+#         'USER': 'admin',
+#         'PASSWORD': 'devpass',
+#         'HOST': 'postgresdb',
+#         'PORT': 5432
+#     }
+# }
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'post_db',
-        'USER': 'admin',
-        'PASSWORD': 'devpass',
-        'HOST': 'postgresdb',
-        'PORT': 5432
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/3.2/ref/settings/#auth-password-validators

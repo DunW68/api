@@ -10,10 +10,10 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from django.contrib.auth import authenticate
-from quickstart.serializers import UserSerializer, LoginSerializer, ItemsSerializer, CartSerializer, TokenSerializer
+from quickstart.serializers import UsersSerializer, LoginSerializer, ItemsSerializer, CartSerializer, TokenSerializer
 from .models import Items, Cart
 from quickstart.tasks import create_new_item, send_ok_email
-
+from drf_yasg.utils import swagger_auto_schema
 
 class NeedLogin(APIException):
     status_code = status.HTTP_403_FORBIDDEN
@@ -36,14 +36,16 @@ class IsLogin(permissions.BasePermission):
 class UserViewSet(viewsets.ModelViewSet):
 
     queryset = User.objects.all().order_by('-date_joined')
-    serializer_class = UserSerializer
-    permission_classes = [IsAuthenticated]
+    serializer_class = UsersSerializer
+    permission_classes = [AllowAny]
 
 
 class UserLogin(APIView):
     permission_classes = [AllowAny]
     serializer_class = LoginSerializer
 
+    @swagger_auto_schema(query_serializer=UsersSerializer,
+                         responses={200: UsersSerializer(many=True)})
     def post(self, request, format=None):
         data = request.data
         user = authenticate(username=data['username'], password=data['password'])
@@ -58,9 +60,12 @@ class ItemsView(APIView):
     permission_classes = [AllowAny]
     serializer_class = ItemsSerializer
 
+    @swagger_auto_schema(query_serializer=ItemsSerializer,
+                         responses={200: ItemsSerializer(many=True)})
     def get(self, request):
         # name and price gets from url (?name=kavo&&price=None)
         name = request.GET.get('name', None)
+        print(request.user, request.auth)
         description = request.GET.get('description', None)
         if name and description:
             # Возвращаем отфильтрованые записи
@@ -85,6 +90,8 @@ class ItemsView(APIView):
             serializer = ItemsSerializer(queryset, many=True)
             return Response(serializer.data)
 
+    @swagger_auto_schema(query_serializer=ItemsSerializer,
+                         responses={200: ItemsSerializer(many=True)})
     def post(self, request):
         # Создать items
         serializer = ItemsSerializer(data=request.data)
@@ -98,7 +105,7 @@ class ItemsView(APIView):
 class DetailView(APIView):
     # ради интереса сделал ссылки на разные итемы, с возможностью удалить их
     # по урлу типа "items/1"
-    permission_classes = [IsLogin]
+    permission_classes = [AllowAny]
     serializer_class = ItemsSerializer
 
     def get(self, request, pk):
@@ -121,9 +128,11 @@ class DetailView(APIView):
 
 
 class CartView(APIView):
-    permission_classes = [IsLogin]
+    permission_classes = [AllowAny]
     serializer_class = CartSerializer
 
+    @swagger_auto_schema(query_serializer=CartSerializer,
+                         responses={200: CartSerializer(many=True)})
     def get(self, request):
         # Список своих карзин
         carts = Cart.objects.all()
@@ -131,13 +140,17 @@ class CartView(APIView):
         serializer = CartSerializer(carts, many=True)
         return Response(serializer.data)
 
+    @swagger_auto_schema(query_serializer=CartSerializer,
+                         responses={200: CartSerializer(many=True)})
     def post(self, request):
         # Принимал на вход item_id
         # Создать карзину
         #user_id = get_object_or_404(User, username=request.user)
         token = get_object_or_404(Token, key=request.auth)
+        print(token)
         user = get_object_or_404(User, id=token.user_id)
         mail = user.email
+        print(mail)
         #request.data['user'] = token.user_id
         data = {'user': token.user_id, 'item': [int(i) for i in request.data['item'] if i.isdigit()]}
         print(data)
@@ -159,8 +172,14 @@ class TokenCheck(APIView):
         return Response(serializer.data)
 
     def post(self, request):
-        # Принимал на вход user_id и item_id
-        # Создать карзину
-        data = request.data
-        key = get_object_or_404(Token, key=data['key'])
-        return Response(key.user_id)
+        # Создать items
+        serializer = ItemsSerializer(data=request.data)
+        create_new_item.delay()
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+
+
