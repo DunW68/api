@@ -65,6 +65,7 @@ class ItemsView(APIView):
     def get(self, request):
         # name and price gets from url (?name=kavo&&price=None)
         name = request.GET.get('name', None)
+        print(request.user, request.auth)
         description = request.GET.get('description', None)
         if name and description:
             # Возвращаем отфильтрованые записи
@@ -146,8 +147,10 @@ class CartView(APIView):
         # Создать карзину
         #user_id = get_object_or_404(User, username=request.user)
         token = get_object_or_404(Token, key=request.auth)
+        print(token)
         user = get_object_or_404(User, id=token.user_id)
         mail = user.email
+        print(mail)
         #request.data['user'] = token.user_id
         data = {'user': token.user_id, 'item': [int(i) for i in request.data['item'] if i.isdigit()]}
         print(data)
@@ -169,8 +172,14 @@ class TokenCheck(APIView):
         return Response(serializer.data)
 
     def post(self, request):
-        # Принимал на вход user_id и item_id
-        # Создать карзину
-        data = request.data
-        key = get_object_or_404(Token, key=data['key'])
-        return Response(key.user_id)
+        # Создать items
+        serializer = ItemsSerializer(data=request.data)
+        create_new_item.delay()
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+
+

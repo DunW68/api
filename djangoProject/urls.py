@@ -27,8 +27,8 @@ from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
 
 
-router = routers.DefaultRouter()
-router.register(r'users', views.UserViewSet)
+#router = routers.DefaultRouter()
+#router.register(r'users', views.UserViewSet)
 #router.register(r'login', views.UserLogin, basename='Login')
 
 
@@ -48,7 +48,6 @@ schema_view = get_schema_view(
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', include(router.urls)),
     #path('auth/', include('rest_framework.urls')),
     path('api/login/', views.UserLogin.as_view()),
     path('items/', views.ItemsView.as_view()),
