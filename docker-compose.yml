@@ -13,6 +13,20 @@ services:
     ports:
       - "5432:5432"
 
+  web:
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    command: sh -c "gunicorn djangoProject.wsgi -b 0.0.0.0:8000 --reload & celery -A djangoProject worker --loglevel=debug"
+    volumes:
+      - ./:/usr/src/app
+      - /static:/static
+    depends_on:
+      - postgresdb
+    ports:
+    - "8000:8000"
+    restart:
+      "always"
 
   redis:
     image: redis
@@ -40,20 +54,7 @@ services:
   #     - postgresdb
   #     - web
 
-  web:
-    build:
-      context: ./
-      dockerfile: Dockerfile
-    command: sh -c "gunicorn djangoProject.wsgi -b 0.0.0.0:8000 --reload & celery -A djangoProject worker --loglevel=debug"
-    volumes:
-      - ./:/usr/src/app
-      - /static:/static
-    depends_on:
-      - postgresdb
-    ports:
-    - "8000:8000"
-    restart:
-      "always"
+
 
   # nginx:
   #   build:

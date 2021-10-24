@@ -6,7 +6,7 @@ from .models import Items, Cart
 from rest_framework import serializers
 
 
-class UserSerializer(serializers.ModelSerializer):
+class UsersSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
@@ -62,7 +62,7 @@ class CartSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Cart
-        fields = ('user', 'item',)
+        fields = ('user', 'item')
 
 
 class TokenSerializer(serializers.ModelSerializer):

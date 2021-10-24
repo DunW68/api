@@ -27,3 +27,6 @@ def send_ok_email(mail):
         [mail],
         fail_silently=False,
     )
+     # Вы
+     # понравились < имя >! Почта
+     # участника: < почта >».
