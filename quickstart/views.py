@@ -131,14 +131,11 @@ class CartView(APIView):
     permission_classes = [AllowAny]
     serializer_class = CartSerializer
 
-    @swagger_auto_schema(query_serializer=CartSerializer,
-                         responses={200: CartSerializer(many=True)})
     def get(self, request):
-        # Список своих карзин
-        carts = Cart.objects.all()
-        print(request.auth)
-        serializer = CartSerializer(carts, many=True)
-        return Response(serializer.data)
+        ip = request.META.get('REMOTE_ADDR')
+        user = {'user': f"{ip}"}
+
+        return Response(user)
 
     @swagger_auto_schema(query_serializer=CartSerializer,
                          responses={200: CartSerializer(many=True)})
