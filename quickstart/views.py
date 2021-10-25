@@ -137,25 +137,25 @@ class CartView(APIView):
 
         return Response(user)
 
-    @swagger_auto_schema(query_serializer=CartSerializer,
-                         responses={200: CartSerializer(many=True)})
-    def post(self, request):
-        # Принимал на вход item_id
-        # Создать карзину
-        #user_id = get_object_or_404(User, username=request.user)
-        token = get_object_or_404(Token, key=request.auth)
-        print(token)
-        user = get_object_or_404(User, id=token.user_id)
-        mail = user.email
-        print(mail)
-        #request.data['user'] = token.user_id
-        data = {'user': token.user_id, 'item': [int(i) for i in request.data['item'] if i.isdigit()]}
-        print(data)
-        serializer = CartSerializer(data=data)
-        if serializer.is_valid():
-            send_ok_email.delay(mail)
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    # @swagger_auto_schema(query_serializer=CartSerializer,
+    #                      responses={200: CartSerializer(many=True)})
+    # def post(self, request):
+    #     # Принимал на вход item_id
+    #     # Создать карзину
+    #     #user_id = get_object_or_404(User, username=request.user)
+    #     token = get_object_or_404(Token, key=request.auth)
+    #     print(token)
+    #     user = get_object_or_404(User, id=token.user_id)
+    #     mail = user.email
+    #     print(mail)
+    #     #request.data['user'] = token.user_id
+    #     data = {'user': token.user_id, 'item': [int(i) for i in request.data['item'] if i.isdigit()]}
+    #     print(data)
+    #     serializer = CartSerializer(data=data)
+    #     if serializer.is_valid():
+    #         send_ok_email.delay(mail)
+    #         return Response(serializer.data, status=status.HTTP_200_OK)
+    #     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class TokenCheck(APIView):
